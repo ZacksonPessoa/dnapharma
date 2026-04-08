@@ -78,3 +78,38 @@ exports.listOrders = async (req, res) => {
     });
   }
 };
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({
+        ok: false,
+        message: "status é obrigatório",
+      });
+    }
+
+    const updatedOrder = await prisma.order.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        status,
+      },
+    });
+
+    return res.json({
+      ok: true,
+      message: "Status atualizado com sucesso",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar status do pedido:", error);
+
+    return res.status(500).json({
+      ok: false,
+      message: error.message || "Erro interno ao atualizar status",
+    });
+  }
+};
