@@ -132,17 +132,31 @@ export default function AdminOrdersPage() {
       </main>
     );
   }
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_email");
+    window.location.replace("/admin/login");
+  };
 
   return (
     <main className="min-h-screen bg-white text-black p-6">
       <section className="max-w-6xl mx-auto space-y-6">
         <div className="space-y-3">
-          <div>
-            <h1 className="text-3xl font-bold">Pedidos</h1>
-            <p className="text-gray-600">
-              Painel simples para visualizar e atualizar os pedidos do lançamento.
-            </p>
-          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <h1 className="text-3xl font-bold">Pedidos</h1>
+                <p className="text-gray-600">
+                Painel simples para visualizar e atualizar os pedidos do lançamento.
+                </p>
+            </div>
+
+            <button
+                onClick={handleLogout}
+                className="rounded-xl border px-4 py-2 font-medium hover:bg-gray-100"
+            >
+                Sair
+            </button>
+            </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">

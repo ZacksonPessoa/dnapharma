@@ -79,10 +79,16 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
     return null;
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_email");
+    window.location.replace("/admin/login");
+  };
+
   return (
     <main className="min-h-screen bg-white text-black p-6">
       <section className="max-w-3xl mx-auto space-y-6">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold">
               Detalhes do pedido #{orderId}
@@ -92,12 +98,21 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
             </p>
           </div>
 
-          <Link
-            href="/admin/orders"
-            className="rounded-xl border px-4 py-2 font-medium hover:bg-gray-100"
-          >
-            Voltar
-          </Link>
+          <div className="flex gap-3">
+            <Link
+              href="/admin/orders"
+              className="rounded-xl border px-4 py-2 font-medium hover:bg-gray-100"
+            >
+              Voltar
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="rounded-xl border px-4 py-2 font-medium hover:bg-gray-100"
+            >
+              Sair
+            </button>
+          </div>
         </div>
 
         {loading ? (
