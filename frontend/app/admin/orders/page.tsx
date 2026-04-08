@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Customer = {
   id: number;
@@ -22,11 +22,13 @@ type Order = {
 };
 
 const STATUS_OPTIONS = ["NEW", "CONTACTED", "PAID", "CANCELLED"];
+const FILTER_OPTIONS = ["ALL", ...STATUS_OPTIONS];
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   const fetchOrders = async () => {
     try {
@@ -81,20 +83,42 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const filteredOrders = useMemo(() => {
+    if (statusFilter === "ALL") return orders;
+    return orders.filter((order) => order.status === statusFilter);
+  }, [orders, statusFilter]);
+
   return (
     <main className="min-h-screen bg-white text-black p-6">
       <section className="max-w-6xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Pedidos</h1>
-          <p className="text-gray-600">
-            Painel simples para visualizar e atualizar os pedidos do lançamento.
-          </p>
+        <div className="space-y-3">
+          <div>
+            <h1 className="text-3xl font-bold">Pedidos</h1>
+            <p className="text-gray-600">
+              Painel simples para visualizar e atualizar os pedidos do lançamento.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium">Filtrar por status:</label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="rounded-lg border px-3 py-2"
+            >
+              {FILTER_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option === "ALL" ? "Todos" : option}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {loading ? (
           <p>Carregando pedidos...</p>
-        ) : orders.length === 0 ? (
-          <p>Nenhum pedido encontrado.</p>
+        ) : filteredOrders.length === 0 ? (
+          <p>Nenhum pedido encontrado para esse filtro.</p>
         ) : (
           <div className="overflow-x-auto rounded-2xl border">
             <table className="w-full text-sm">
@@ -111,7 +135,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {filteredOrders.map((order) => (
                   <tr key={order.id} className="border-t">
                     <td className="p-3">{order.id}</td>
                     <td className="p-3">{order.customer.name}</td>
