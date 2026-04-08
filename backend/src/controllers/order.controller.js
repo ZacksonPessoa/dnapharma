@@ -113,3 +113,36 @@ exports.updateOrderStatus = async (req, res) => {
     });
   }
 };
+exports.getOrderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        customer: true,
+      },
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        ok: false,
+        message: "Pedido não encontrado",
+      });
+    }
+
+    return res.json({
+      ok: true,
+      order,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar pedido por ID:", error);
+
+    return res.status(500).json({
+      ok: false,
+      message: error.message || "Erro interno ao buscar pedido",
+    });
+  }
+};
