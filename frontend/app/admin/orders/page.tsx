@@ -24,6 +24,21 @@ type Order = {
 const STATUS_OPTIONS = ["NEW", "CONTACTED", "PAID", "CANCELLED"];
 const FILTER_OPTIONS = ["ALL", ...STATUS_OPTIONS];
 
+function getStatusBadgeClass(status: string) {
+  switch (status) {
+    case "NEW":
+      return "bg-blue-100 text-blue-800";
+    case "CONTACTED":
+      return "bg-yellow-100 text-yellow-800";
+    case "PAID":
+      return "bg-green-100 text-green-800";
+    case "CANCELLED":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+}
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -150,6 +165,7 @@ export default function AdminOrdersPage() {
                   <th className="p-3 text-left">Qtd</th>
                   <th className="p-3 text-left">Total</th>
                   <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Alterar status</th>
                   <th className="p-3 text-left">Data</th>
                 </tr>
               </thead>
@@ -162,6 +178,13 @@ export default function AdminOrdersPage() {
                     <td className="p-3">{order.customer.email}</td>
                     <td className="p-3">{order.quantity}</td>
                     <td className="p-3">R$ {order.totalAmount.toFixed(2)}</td>
+                    <td className="p-3">
+                      <span
+                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStatusBadgeClass(order.status)}`}
+                      >
+                        {order.status}
+                      </span>
+                    </td>
                     <td className="p-3">
                       <select
                         value={order.status}
