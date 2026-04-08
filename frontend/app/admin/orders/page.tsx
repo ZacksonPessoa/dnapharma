@@ -27,11 +27,18 @@ const FILTER_OPTIONS = ["ALL", ...STATUS_OPTIONS];
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (isManualRefresh = false) => {
     try {
+      if (isManualRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       const response = await fetch("http://localhost:3333/orders");
       const data = await response.json();
 
@@ -40,8 +47,10 @@ export default function AdminOrdersPage() {
       }
     } catch (error) {
       console.error("Erro ao buscar pedidos:", error);
+      alert("Erro ao buscar pedidos.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -99,19 +108,29 @@ export default function AdminOrdersPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <label className="text-sm font-medium">Filtrar por status:</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-lg border px-3 py-2"
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium">Filtrar por status:</label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="rounded-lg border px-3 py-2"
+              >
+                {FILTER_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option === "ALL" ? "Todos" : option}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => fetchOrders(true)}
+              disabled={refreshing}
+              className="rounded-xl border px-4 py-2 font-medium hover:bg-gray-100 disabled:opacity-50"
             >
-              {FILTER_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option === "ALL" ? "Todos" : option}
-                </option>
-              ))}
-            </select>
+              {refreshing ? "Atualizando..." : "Atualizar lista"}
+            </button>
           </div>
         </div>
 
