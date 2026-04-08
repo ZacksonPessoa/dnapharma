@@ -59,7 +59,7 @@ export default function AdminOrdersPage() {
         setLoading(true);
       }
 
-      const response = await fetch("http://localhost:3333/orders");
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`);
       const data = await response.json();
 
       if (data.ok) {
@@ -91,7 +91,7 @@ export default function AdminOrdersPage() {
       setUpdatingId(orderId);
 
       const response = await fetch(
-        `http://localhost:3333/orders/${orderId}/status`,
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/status`,
         {
           method: "PATCH",
           headers: {

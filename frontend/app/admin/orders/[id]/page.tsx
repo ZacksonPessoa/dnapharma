@@ -51,7 +51,9 @@ export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
       setOrderId(id);
 
       try {
-        const response = await fetch(`http://localhost:3333/orders/${id}`);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/orders/${id}`
+        );
         const data = await response.json();
 
         if (data.ok) {
