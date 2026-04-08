@@ -28,15 +28,24 @@ type OrderDetailsPageProps = {
   }>;
 };
 
-export default function OrderDetailsPage({
-  params,
-}: OrderDetailsPageProps) {
+export default function OrderDetailsPage({ params }: OrderDetailsPageProps) {
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadParamsAndFetch = async () => {
+    const token = localStorage.getItem("admin_token");
+
+    if (!token) {
+      setAuthorized(false);
+      window.location.replace("/admin/login");
+      return;
+    }
+
+    setAuthorized(true);
+
+    const loadOrder = async () => {
       const resolvedParams = await params;
       const id = resolvedParams.id;
       setOrderId(id);
@@ -55,8 +64,20 @@ export default function OrderDetailsPage({
       }
     };
 
-    loadParamsAndFetch();
+    loadOrder();
   }, [params]);
+
+  if (authorized === null) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Verificando acesso...</p>
+      </main>
+    );
+  }
+
+  if (!authorized) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-white text-black p-6">
@@ -89,28 +110,12 @@ export default function OrderDetailsPage({
               <h2 className="text-xl font-semibold">Informações do pedido</h2>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <p>
-                  <span className="font-medium">ID:</span> {order.id}
-                </p>
-                <p>
-                  <span className="font-medium">Status:</span> {order.status}
-                </p>
-                <p>
-                  <span className="font-medium">Quantidade:</span>{" "}
-                  {order.quantity}
-                </p>
-                <p>
-                  <span className="font-medium">Preço unitário:</span> R${" "}
-                  {order.unitPrice.toFixed(2)}
-                </p>
-                <p>
-                  <span className="font-medium">Total:</span> R${" "}
-                  {order.totalAmount.toFixed(2)}
-                </p>
-                <p>
-                  <span className="font-medium">Data:</span>{" "}
-                  {new Date(order.createdAt).toLocaleString("pt-BR")}
-                </p>
+                <p><span className="font-medium">ID:</span> {order.id}</p>
+                <p><span className="font-medium">Status:</span> {order.status}</p>
+                <p><span className="font-medium">Quantidade:</span> {order.quantity}</p>
+                <p><span className="font-medium">Preço unitário:</span> R$ {order.unitPrice.toFixed(2)}</p>
+                <p><span className="font-medium">Total:</span> R$ {order.totalAmount.toFixed(2)}</p>
+                <p><span className="font-medium">Data:</span> {new Date(order.createdAt).toLocaleString("pt-BR")}</p>
               </div>
             </div>
 
@@ -118,17 +123,10 @@ export default function OrderDetailsPage({
               <h2 className="text-xl font-semibold">Dados do cliente</h2>
 
               <div className="grid gap-3 sm:grid-cols-2">
-                <p>
-                  <span className="font-medium">Nome:</span>{" "}
-                  {order.customer.name}
-                </p>
-                <p>
-                  <span className="font-medium">Telefone:</span>{" "}
-                  {order.customer.phone}
-                </p>
+                <p><span className="font-medium">Nome:</span> {order.customer.name}</p>
+                <p><span className="font-medium">Telefone:</span> {order.customer.phone}</p>
                 <p className="sm:col-span-2">
-                  <span className="font-medium">Email:</span>{" "}
-                  {order.customer.email}
+                  <span className="font-medium">Email:</span> {order.customer.email}
                 </p>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 type Customer = {
@@ -41,6 +42,9 @@ function getStatusBadgeClass(status: string) {
 }
 
 export default function AdminOrdersPage() {
+  const router = useRouter();
+
+  const [authorized, setAuthorized] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,8 +75,16 @@ export default function AdminOrdersPage() {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("admin_token");
+
+    if (!token) {
+      router.push("/admin/login");
+      return;
+    }
+
+    setAuthorized(true);
     fetchOrders();
-  }, []);
+  }, [router]);
 
   const handleStatusChange = async (orderId: number, status: string) => {
     try {
@@ -112,6 +124,14 @@ export default function AdminOrdersPage() {
     if (statusFilter === "ALL") return orders;
     return orders.filter((order) => order.status === statusFilter);
   }, [orders, statusFilter]);
+
+  if (!authorized) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <p>Verificando acesso...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-white text-black p-6">
@@ -174,12 +194,12 @@ export default function AdminOrdersPage() {
                 {filteredOrders.map((order) => (
                   <tr key={order.id} className="border-t">
                     <td className="p-3">
-                    <Link
+                      <Link
                         href={`/admin/orders/${order.id}`}
                         className="font-medium text-blue-600 underline"
-                    >
+                      >
                         {order.id}
-                    </Link>
+                      </Link>
                     </td>
                     <td className="p-3">{order.customer.name}</td>
                     <td className="p-3">{order.customer.phone}</td>
