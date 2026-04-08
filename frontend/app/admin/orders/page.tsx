@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Customer = {
@@ -172,7 +173,14 @@ export default function AdminOrdersPage() {
               <tbody>
                 {filteredOrders.map((order) => (
                   <tr key={order.id} className="border-t">
-                    <td className="p-3">{order.id}</td>
+                    <td className="p-3">
+                    <Link
+                        href={`/admin/orders/${order.id}`}
+                        className="font-medium text-blue-600 underline"
+                    >
+                        {order.id}
+                    </Link>
+                    </td>
                     <td className="p-3">{order.customer.name}</td>
                     <td className="p-3">{order.customer.phone}</td>
                     <td className="p-3">{order.customer.email}</td>
